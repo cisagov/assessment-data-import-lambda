@@ -20,7 +20,7 @@ pip install --upgrade pip setuptools
 ###
 # Install other requirements
 ###
-# TBD
+pip install --upgrade docopt>=0.6.2 pymongo>=3.7.2 pytz>=2019.1
 
 ###
 # Leave the Python virtual environment
