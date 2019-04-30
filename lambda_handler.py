@@ -1,19 +1,24 @@
-import json
 import logging
 import os
 
-from boto3 import client as boto3_client
+# Local module
+from adi import assessment_data_import as adi
 
 # This Lambda function expects the following environment variables to be
 # defined:
-# 1. assessment_data_s3_bucket - The name of the bucket where the assessment
-# data JSON file lives
-# 2. assessment_data_filename - The name of the assessment data JSON file in
-# the assessment_data_s3_bucket
-# 3. db_creds_s3_bucket - The name of the bucket where the database credentials
-# YAML file lives
-# 4. db_creds_filename - The name of the database credentials YAML file in the
-# db_creds_s3_bucket
+# 1. s3_bucket - The AWS S3 bucket containing the assessment data file
+# 2. data_filename - The name of the file containing the assessment data in
+# the S3 bucket above
+# 3. db_hostname - The hostname that has the database to store the assessment
+# data in
+# 4. db_port - The port that the database server is listening on
+# 5. ssm_db_name - The name of the parameter in AWS SSM that holds the name
+# of the database to store the assessment data in.
+# 6. ssm_db_user - The name of the parameter in AWS SSM that holds the
+# database username with write permission to the assessment database.
+# 7. ssm_db_password - The name of the parameter in AWS SSM that holds the
+# database password for the user with write permission to the assessment
+# database.
 
 # In the case of AWS Lambda, the root logger is used BEFORE our Lambda handler
 # runs, and this creates a default handler that goes to the console.  Once
@@ -33,50 +38,42 @@ if root.handlers:
         root.removeHandler(handler)
 
         # Set up logging
-        log_level = logging.DEBUG  #TODO Change back to WARNING when done debugging
+        log_level = logging.INFO
         logging.basicConfig(format='%(asctime)-15s %(levelname)s %(message)s',
                             level=log_level)
 
+
 def handler(event, context):
-    """
-    Handler for all Lambda events
-    """
-    # Boto3 clients for S3 and Lambda
-    s3_client = boto3_client('s3')
-    lambda_client = boto3_client('lambda')
+    """Handle all Lambda events."""
+    logging.debug('AWS Event was: {}'.format(event))
 
-    logging.info('AWS Event was: {}'.format(event))
+    # Get info in the S3 event notification message from
+    # the parent Lambda function.
+    record = event['Records'][0]
 
-    # s3.download_file('assessment-data-daver', 'remote-assessment-data.json', '/tmp/remote-assessment-data.json')
-
-    # # This is an SQS message relayed by the parent Lambda function.
-    # #
-    # # Extract some variables from the event dictionary.  See
-    # # https://docs.aws.amazon.com/AmazonS3/latest/dev/notification-content-structure.html
-    # # for details on the event structure corresponding to objects created
-    # # in an S3 bucket.
-    # receipt_handle = event['ReceiptHandle']
-    # body = json.loads(event['Body'])
-    # success = {}
-    # for record in body['Records']:
-    #     bucket = record['s3']['bucket']['name']
-    #     key = record['s3']['object']['key']
-    #
-    #     # Process the DMARC aggregate reports
-    #     returnVal = s3.do_it(SCHEMA, bucket, key,
-    #                          DOMAINS, REPORTS,
-    #                          os.environ['elasticsearch_url'],
-    #                          os.environ['elasticsearch_index'],
-    #                          os.environ['elasticsearch_region'],
-    #                          TOKEN, DELETE)
-    #     logging.debug('Response from do_it() is {}'.format(returnVal))
-    #
-    #     # Update the success dictionary
-    #     success = {**success, **returnVal}
-    #
-    #     # If everything succeeded then delete the message from the queue
-    #     if all(v for v in success.values()):
-    #         logging.info('Deleting message from queue after '
-    #                      'successful processing')
-    #         sqs_client.delete_message(QueueUrl=os.environ['queue_url'],
-    #                                   ReceiptHandle=receipt_handle)
+    # Verify event has correct eventName
+    if record['eventName'] == 'ObjectCreated:Put':
+        # Verify event originated from correct bucket and key
+        if record['s3']['bucket']['name'] == os.environ['s3_bucket'] and \
+           record['s3']['object']['key'] == os.environ['data_filename']:
+            # Import the assessment data
+            adi.import_data(s3_bucket=os.environ['s3_bucket'],
+                            data_filename=os.environ['data_filename'],
+                            db_hostname=os.environ['db_hostname'],
+                            db_port=os.environ['db_port'],
+                            ssm_db_name=os.environ['ssm_db_name'],
+                            ssm_db_user=os.environ['ssm_db_user'],
+                            ssm_db_password=os.environ['ssm_db_password'],
+                            log_level=log_level)
+        else:
+            logging.warning('Expected ObjectCreated event from S3 bucket '
+                            f"{os.environ['s3_bucket']} "
+                            f"with key {os.environ['data_filename']}, but "
+                            "received event from S3 bucket "
+                            f"{record['s3']['bucket']['name']} with key "
+                            f"{record['s3']['object']['key']}")
+            logging.warning('Full AWS event: {}'.format(event))
+    else:
+        logging.warning('Unexpected eventName received: {}'.format(
+            record['eventName']))
+        logging.warning('Full AWS event: {}'.format(event))
