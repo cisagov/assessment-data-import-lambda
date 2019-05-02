@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  build_dmarc_lambda:
+  build_assessment_data_import_lambda:
     build: .
     image: 'dhsncats/build_assessment_data_import_lambda'
     volumes:
