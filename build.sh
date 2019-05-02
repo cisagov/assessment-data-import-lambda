@@ -18,6 +18,11 @@ source $VENV_DIR/bin/activate
 pip install --upgrade pip setuptools
 
 ###
+# Install local assessment data import (adi) module
+###
+pip install -r requirements.txt
+
+###
 # Install other requirements
 ###
 pip install --upgrade docopt>=0.6.2 pymongo>=3.7.2 pytz>=2019.1
