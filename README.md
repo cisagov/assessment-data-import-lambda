@@ -1,6 +1,8 @@
 # assessment-data-import-lambda ƛ #
 
 [![Build Status](https://travis-ci.com/cisagov/assessment-data-import-lambda.svg?branch=develop)](https://travis-ci.com/cisagov/assessment-data-import-lambda)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/cisagov/assessment-data-import-lambda.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cisagov/assessment-data-import-lambda/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/cisagov/assessment-data-import-lambda.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cisagov/assessment-data-import-lambda/context:python)
 
 `assessment-data-import-lambda` contains code to build an AWS Lambda function
 that reads assessment data from a JSON file in an S3 bucket and imports it
