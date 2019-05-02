@@ -1,3 +1,5 @@
 .python-version
 .DS_Store
+*.egg-info
+__pycache__
 assessment-data-import.zip
