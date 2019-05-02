@@ -17,10 +17,10 @@ Building the AWS Lambda zip file:
 ## Note ##
 
 Please note that the corresponding Docker image _must_ be rebuilt
-locally if the script `<scanner>/build_<scanner>.sh` changes.  Given
-that rebuilding the Docker image is very fast (due to Docker's
-caching) if the script has not changed, it is a very good idea to
-_always_ run the `docker-compose build` step when using this tool.
+locally if the script `build.sh` changes.  Given that rebuilding the Docker
+image is very fast (due to Docker's caching) if the script has not changed, it
+is a very good idea to _always_ run the `docker-compose build` step when
+using this tool.
 
 ## License ##
 
