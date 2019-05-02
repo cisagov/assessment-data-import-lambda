@@ -39,6 +39,7 @@ import datetime
 import json
 import logging
 import os
+import tempfile
 
 # Third-party libraries (install with pip)
 from boto3 import client as boto3_client
@@ -49,9 +50,17 @@ from pytz import utc
 # Local library
 from adi import __version__
 
-def import_data(s3_bucket=None, data_filename=None, db_hostname=None,
-                db_port="27017", ssm_db_name=None, ssm_db_user=None,
-                ssm_db_password=None, log_level="warning"):
+
+def import_data(
+    s3_bucket=None,
+    data_filename=None,
+    db_hostname=None,
+    db_port="27017",
+    ssm_db_name=None,
+    ssm_db_user=None,
+    ssm_db_password=None,
+    log_level="warning",
+):
     """Import assessment data from a JSON file in an S3 bucket to a database.
 
     Parameters
@@ -99,95 +108,114 @@ def import_data(s3_bucket=None, data_filename=None, db_hostname=None,
     # TODO Add error checking?
     # TODO Determine which fields are required vs. optional
 
-    # Fetch assessment data file from S3 bucket
-    s3_client.download_file(Bucket=s3_bucket, Key=data_filename,
-                            Filename=f"/tmp/{data_filename}")
-    logging.info(f"Retrieved {data_filename} from S3 bucket {s3_bucket}")
+    # Securely create a temporary file to store the JSON data in
+    temp_file_descriptor, temp_assessment_filepath = tempfile.mkstemp()
 
-    # Load assessment data JSON
-    with open(f"/tmp/{data_filename}") as assessment_json_file:
-        assessment_data = json.load(assessment_json_file)
-    logging.info(f"JSON data loaded from {data_filename}")
+    try:
+        # Fetch assessment data file from S3 bucket
+        s3_client.download_file(
+            Bucket=s3_bucket, Key=data_filename, Filename=f"{temp_assessment_filepath}"
+        )
+        logging.info(f"Retrieved {data_filename} from S3 bucket {s3_bucket}")
 
-    # Fetch database credentials from AWS SSM
-    db_info = dict()
-    for ssm_param_name, key in (
-        (ssm_db_name, "db_name"),
-        (ssm_db_user, "username"),
-        (ssm_db_password, "password")
-    ):
-        response = ssm_client.get_parameter(Name=ssm_param_name,
-                                            WithDecryption=True)
-        db_info[key] = response["Parameter"]["Value"]
+        # Load assessment data JSON
+        with open(f"{temp_assessment_filepath}") as assessment_json_file:
+            assessment_data = json.load(assessment_json_file)
+        logging.info(f"JSON data loaded from {data_filename}")
 
-    # Set up database connection
-    db_uri = f"mongodb://{db_info['username']}:{db_info['password']}@" \
-        f"{db_hostname}:{db_port}/{db_info['db_name']}"
+        # Fetch database credentials from AWS SSM
+        db_info = dict()
+        for ssm_param_name, key in (
+            (ssm_db_name, "db_name"),
+            (ssm_db_user, "username"),
+            (ssm_db_password, "password"),
+        ):
+            response = ssm_client.get_parameter(
+                Name=ssm_param_name, WithDecryption=True
+            )
+            db_info[key] = response["Parameter"]["Value"]
 
-    db_connection = MongoClient(host=db_uri, tz_aware=True)
-    db = db_connection[db_info["db_name"]]
-    logging.info(f"DB connection set up to {db_hostname}:{db_port}/"
-                 f"{db_info['db_name']}")
+        # Set up database connection
+        db_uri = (
+            f"mongodb://{db_info['username']}:{db_info['password']}@"
+            f"{db_hostname}:{db_port}/{db_info['db_name']}"
+        )
 
-    # Iterate through assessment data and save each record to the database
-    for assessment in assessment_data:
-        # Convert dates to UTC datetimes
-        for date_field in ("ROE Date",
-                           "Testing Complete Date"):
-            if assessment.get(date_field):
-                assessment[date_field] = datetime.datetime.strptime(
-                    assessment[date_field],
-                    '%a, %d %b %Y %H:%M:%S %z')
-                assessment[date_field] = assessment[date_field].replace(
-                    tzinfo=utc) - assessment[date_field].utcoffset()
+        db_connection = MongoClient(host=db_uri, tz_aware=True)
+        db = db_connection[db_info["db_name"]]
+        logging.info(
+            f"DB connection set up to {db_hostname}:{db_port}/" f"{db_info['db_name']}"
+        )
 
-        db.rva.replace_one({"_id": assessment["id"]}, {
-            "_id": assessment["id"],
-            # "status": assessment.get("Status"),
-            # "created": assessment.get("Created"),
-            # "updated": assessment.get("Updated"),
-            # "appendix_a_date": assessment.get("Appendix A Date"),
-            "appendix_a_signed": assessment.get("Appendix A Signed"),
-            "appendix_b_signed": assessment.get("Appendix B Signed"),
-            "assessment_type": assessment.get("Assessment Type"),
-            # "external_testing_begin_date": assessment.get("TBD"),
-            # "external_testing_end_date": assessment.get("TBD"),
-            # "group": assessment.get("TBD"),
-            # "internal_testing_begin_date": assessment.get("TBD"),
-            # "internal_testing_city": assessment.get("TBD"),
-            # "internal_testing_end_date": assessment.get("TBD"),
-            "mgmt_req": assessment.get("Mgmt Req"),
-            "roe_date": assessment.get("ROE Date"),
-            "roe_number": assessment.get("ROE Number"),
-            "roe_signed": assessment.get("ROE Signed"),
-            # "summary": assessment.get("Summary"),
-            "asmt_name": assessment.get("Asmt Name"),
-            # "requested_services": assessment.get("TBD"),
-            "stakeholder_name": assessment.get("Stakeholder Name"),
-            "state": assessment.get("State"),
-            "testing_complete_date": assessment.get("Testing Complete Date"),
-            # "testing_phase": assessment.get("TBD"),
-            "election": assessment.get("Election"),  # TODO: Make real boolean
-            "testing_sector": assessment.get("Testing Sector"),
-            # "ci_type": assessment.get("TBD"),
-            # "ci_systems": assessment.get("TBD"),
-            "fed_lead": assessment.get("Fed Lead"),
-            # "contractor_operator_count": assessment.get("TBD"),
-            # "draft_poc_date": assessment.get("TBD"),
-            # "fed_operator_count": assessment.get("TBD"),
-            # "report_final_date": assessment.get("TBD"),
-            # "operators": assessment.get("TBD"),
-            # "stakeholder_id": assessment.get("TBD"),
-            # "testing_begin_date": assessment.get("TBD")
-        }, upsert=True)
-    logging.info(f"{len(assessment_data)} assessment documents "
-                 "successfully inserted/updated in database")
+        # Iterate through assessment data and save each record to the database
+        for assessment in assessment_data:
+            # Convert dates to UTC datetimes
+            for date_field in ("ROE Date", "Testing Complete Date"):
+                if assessment.get(date_field):
+                    assessment[date_field] = datetime.datetime.strptime(
+                        assessment[date_field], "%a, %d %b %Y %H:%M:%S %z"
+                    )
+                    assessment[date_field] = (
+                        assessment[date_field].replace(tzinfo=utc)
+                        - assessment[date_field].utcoffset()
+                    )
 
-    # Delete local assessment data file from /tmp and from S3 bucket
-    os.remove(f"/tmp/{data_filename}")
-    s3_client.delete_object(Bucket=s3_bucket, Key=data_filename)
-    logging.info(f"Deleted {data_filename} from local filesystem "
-                 f"and from S3 bucket {s3_bucket}")
+            db.rva.replace_one(
+                {"_id": assessment["id"]},
+                {
+                    "_id": assessment["id"],
+                    # "status": assessment.get("Status"),
+                    # "created": assessment.get("Created"),
+                    # "updated": assessment.get("Updated"),
+                    # "appendix_a_date": assessment.get("Appendix A Date"),
+                    "appendix_a_signed": assessment.get("Appendix A Signed"),
+                    "appendix_b_signed": assessment.get("Appendix B Signed"),
+                    "assessment_type": assessment.get("Assessment Type"),
+                    # "external_testing_begin_date": assessment.get("TBD"),
+                    # "external_testing_end_date": assessment.get("TBD"),
+                    # "group": assessment.get("TBD"),
+                    # "internal_testing_begin_date": assessment.get("TBD"),
+                    # "internal_testing_city": assessment.get("TBD"),
+                    # "internal_testing_end_date": assessment.get("TBD"),
+                    "mgmt_req": assessment.get("Mgmt Req"),
+                    "roe_date": assessment.get("ROE Date"),
+                    "roe_number": assessment.get("ROE Number"),
+                    "roe_signed": assessment.get("ROE Signed"),
+                    # "summary": assessment.get("Summary"),
+                    "asmt_name": assessment.get("Asmt Name"),
+                    # "requested_services": assessment.get("TBD"),
+                    "stakeholder_name": assessment.get("Stakeholder Name"),
+                    "state": assessment.get("State"),
+                    "testing_complete_date": assessment.get("Testing Complete Date"),
+                    # "testing_phase": assessment.get("TBD"),
+                    "election": assessment.get("Election"),  # TODO: Make real boolean
+                    "testing_sector": assessment.get("Testing Sector"),
+                    # "ci_type": assessment.get("TBD"),
+                    # "ci_systems": assessment.get("TBD"),
+                    "fed_lead": assessment.get("Fed Lead"),
+                    # "contractor_operator_count": assessment.get("TBD"),
+                    # "draft_poc_date": assessment.get("TBD"),
+                    # "fed_operator_count": assessment.get("TBD"),
+                    # "report_final_date": assessment.get("TBD"),
+                    # "operators": assessment.get("TBD"),
+                    # "stakeholder_id": assessment.get("TBD"),
+                    # "testing_begin_date": assessment.get("TBD")
+                },
+                upsert=True,
+            )
+        logging.info(
+            f"{len(assessment_data)} assessment documents "
+            "successfully inserted/updated in database"
+        )
+
+        # Delete assessment data object from S3 bucket
+        s3_client.delete_object(Bucket=s3_bucket, Key=data_filename)
+        logging.info(f"Deleted {data_filename} from S3 bucket {s3_bucket}")
+    finally:
+        # Delete local temp assessment data file regardless of whether or not
+        # any exceptions were thrown in the try block above
+        os.remove(f"{temp_assessment_filepath}")
+        logging.info(f"Deleted {data_filename} from local filesystem")
 
     return True
 
@@ -200,8 +228,7 @@ def main():
     log_level = args["--log-level"]
     try:
         logging.basicConfig(
-            format="%(asctime)-15s %(levelname)s %(message)s",
-            level=log_level.upper()
+            format="%(asctime)-15s %(levelname)s %(message)s", level=log_level.upper()
         )
     except ValueError:
         logging.critical(
@@ -210,10 +237,16 @@ def main():
         )
         return 1
 
-    result = import_data(args["--s3-bucket"], args["--data-filename"],
-                         args["--db-hostname"], args["--db-port"],
-                         args["--ssm-db-name"], args["--ssm-db-user"],
-                         args["--ssm-db-password"], args["--log-level"])
+    result = import_data(
+        args["--s3-bucket"],
+        args["--data-filename"],
+        args["--db-hostname"],
+        args["--db-port"],
+        args["--ssm-db-name"],
+        args["--ssm-db-user"],
+        args["--ssm-db-password"],
+        args["--log-level"],
+    )
 
     # Stop logging and clean up
     logging.shutdown()

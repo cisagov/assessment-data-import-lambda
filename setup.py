@@ -53,6 +53,5 @@ setup(
     install_requires=["docopt"],
     extras_require={"test": ["pre-commit"]},
     # Conveniently allows one to run the CLI tool as `example`
-    entry_points={"console_scripts":
-                  ["adi = adi.assessment_data_import:main"]},
+    entry_points={"console_scripts": ["adi = adi.assessment_data_import:main"]},
 )

@@ -39,41 +39,47 @@ if root.handlers:
 
         # Set up logging
         log_level = logging.INFO
-        logging.basicConfig(format='%(asctime)-15s %(levelname)s %(message)s',
-                            level=log_level)
+        logging.basicConfig(
+            format="%(asctime)-15s %(levelname)s %(message)s", level=log_level
+        )
 
 
 def handler(event, context):
     """Handle all Lambda events."""
-    logging.debug('AWS Event was: {}'.format(event))
+    logging.debug("AWS Event was: {}".format(event))
 
     # Get info in the S3 event notification message from
     # the parent Lambda function.
-    record = event['Records'][0]
+    record = event["Records"][0]
 
     # Verify event has correct eventName
-    if record['eventName'] == 'ObjectCreated:Put':
+    if record["eventName"] == "ObjectCreated:Put":
         # Verify event originated from correct bucket and key
-        if record['s3']['bucket']['name'] == os.environ['s3_bucket'] and \
-           record['s3']['object']['key'] == os.environ['data_filename']:
+        if (
+            record["s3"]["bucket"]["name"] == os.environ["s3_bucket"]
+            and record["s3"]["object"]["key"] == os.environ["data_filename"]
+        ):
             # Import the assessment data
-            adi.import_data(s3_bucket=os.environ['s3_bucket'],
-                            data_filename=os.environ['data_filename'],
-                            db_hostname=os.environ['db_hostname'],
-                            db_port=os.environ['db_port'],
-                            ssm_db_name=os.environ['ssm_db_name'],
-                            ssm_db_user=os.environ['ssm_db_user'],
-                            ssm_db_password=os.environ['ssm_db_password'],
-                            log_level=log_level)
+            adi.import_data(
+                s3_bucket=os.environ["s3_bucket"],
+                data_filename=os.environ["data_filename"],
+                db_hostname=os.environ["db_hostname"],
+                db_port=os.environ["db_port"],
+                ssm_db_name=os.environ["ssm_db_name"],
+                ssm_db_user=os.environ["ssm_db_user"],
+                ssm_db_password=os.environ["ssm_db_password"],
+                log_level=log_level,
+            )
         else:
-            logging.warning('Expected ObjectCreated event from S3 bucket '
-                            f"{os.environ['s3_bucket']} "
-                            f"with key {os.environ['data_filename']}, but "
-                            "received event from S3 bucket "
-                            f"{record['s3']['bucket']['name']} with key "
-                            f"{record['s3']['object']['key']}")
-            logging.warning('Full AWS event: {}'.format(event))
+            logging.warning(
+                "Expected ObjectCreated event from S3 bucket "
+                f"{os.environ['s3_bucket']} "
+                f"with key {os.environ['data_filename']}, but "
+                "received event from S3 bucket "
+                f"{record['s3']['bucket']['name']} with key "
+                f"{record['s3']['object']['key']}"
+            )
+            logging.warning("Full AWS event: {}".format(event))
     else:
-        logging.warning('Unexpected eventName received: {}'.format(
-            record['eventName']))
-        logging.warning('Full AWS event: {}'.format(event))
+        logging.warning("Unexpected eventName received: {}".format(record["eventName"]))
+        logging.warning("Full AWS event: {}".format(event))
