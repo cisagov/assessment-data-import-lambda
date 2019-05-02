@@ -43,7 +43,9 @@ pip install --upgrade docopt>=0.6.2 pymongo>=3.7.2 pytz>=2019.1
 # since otherwise we get an error that states "/venv/bin/activate:
 # line 31: $1: unbound variable".
 ###
+set +o nounset
 deactivate
+set -o nounset
 
 ###
 # Set up the build directory
