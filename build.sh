@@ -38,6 +38,10 @@ pip install --upgrade docopt>=0.6.2 pymongo>=3.7.2 pytz>=2019.1
 
 ###
 # Leave the Python virtual environment
+#
+# Note that we have to turn off nounset before running deactivate,
+# since otherwise we get an error that states "/venv/bin/activate:
+# line 31: $1: unbound variable".
 ###
 deactivate
 
