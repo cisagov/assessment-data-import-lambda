@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -o nounset
+set -o errexit
+set -o pipefail
+
 ###
 # Define the name of the Lambda zip file being produced
 ###
@@ -10,6 +14,11 @@ ZIP_FILE=assessment-data-import.zip
 ###
 VENV_DIR=/venv
 python -m venv $VENV_DIR
+# Here shellcheck complains because it can't follow the dynamic path.
+# The path doesn't even exist until runtime, so we must disable that
+# check.
+#
+# shellcheck disable=1090
 source $VENV_DIR/bin/activate
 
 ###
