@@ -46,6 +46,8 @@ import docopt
 from pymongo import MongoClient
 from pytz import utc
 
+# Local library
+from adi import __version__
 
 def import_data(s3_bucket=None, data_filename=None, db_hostname=None,
                 db_port="27017", ssm_db_name=None, ssm_db_user=None,
@@ -192,7 +194,7 @@ def import_data(s3_bucket=None, data_filename=None, db_hostname=None,
 
 def main():
     # Parse command line arguments
-    args = docopt.docopt(__doc__, version="1.0.0")
+    args = docopt.docopt(__doc__, version=__version__)
 
     # Set up logging
     log_level = args["--log-level"]
