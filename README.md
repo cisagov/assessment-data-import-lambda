@@ -9,10 +9,11 @@ into a database.
 ## Example ##
 
 Building the AWS Lambda zip file:
+
 1. `cd ~/cisagov/assessment-data-import-lambda`
-2. `docker-compose down`
-2. `docker-compose build`
-3. `docker-compose up`
+1. `docker-compose down`
+1. `docker-compose build`
+1. `docker-compose up`
 
 ## Note ##
 
