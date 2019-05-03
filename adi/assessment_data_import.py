@@ -241,7 +241,7 @@ def import_data(
         # Delete local temp assessment data file regardless of whether or not
         # any exceptions were thrown in the try block above
         os.remove(f"{temp_assessment_filepath}")
-        logging.info(f"Deleted {data_filename} from local filesystem")
+        logging.info(f"Deleted temporary {data_filename} from local filesystem")
 
     return True
 
