@@ -150,7 +150,21 @@ def import_data(
         # Iterate through assessment data and save each record to the database
         for assessment in assessment_data:
             # Convert dates to UTC datetimes
-            for date_field in ("ROE Date", "Testing Complete Date"):
+            for date_field in (
+                "Appendix A Date",
+                "created",
+                "Draft Complete Date",
+                "External Testing Begin Date",
+                "External Testing End Date",
+                "resolved",
+                "Internal Testing Begin Date",
+                "Internal Testing End Date",
+                "Report Final Date",
+                "ROE Date",
+                "Testing Begin Date",
+                "Testing Complete Date",
+                "updated",
+            ):
                 if assessment.get(date_field):
                     assessment[date_field] = datetime.datetime.strptime(
                         assessment[date_field], "%a, %d %b %Y %H:%M:%S %z"
