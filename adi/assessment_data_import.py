@@ -247,6 +247,7 @@ def import_data(
 
 
 def main():
+    """Set up logging and call the import_data function."""
     # Parse command line arguments
     args = docopt.docopt(__doc__, version=__version__)
 
