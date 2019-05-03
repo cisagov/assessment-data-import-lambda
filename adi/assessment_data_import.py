@@ -174,46 +174,58 @@ def import_data(
                         - assessment[date_field].utcoffset()
                     )
 
-            db.rva.replace_one(
+            db.assessments.replace_one(
                 {"_id": assessment["id"]},
                 {
+                    # Required fields
                     "_id": assessment["id"],
-                    # "status": assessment.get("Status"),
-                    # "created": assessment.get("Created"),
-                    # "updated": assessment.get("Updated"),
-                    # "appendix_a_date": assessment.get("Appendix A Date"),
+                    "assessment_name": assessment["Asmt Name"],
+                    "assessment_status": assessment["status"],
+                    "created": assessment["created"],
+                    "stakeholder_name": assessment["Stakeholder Name"],
+                    # Optional fields
                     "appendix_a_signed": assessment.get("Appendix A Signed"),
+                    "appendix_a_signed_date": assessment.get("Appendix A Date"),
                     "appendix_b_signed": assessment.get("Appendix B Signed"),
-                    "assessment_type": assessment.get("Assessment Type"),
-                    # "external_testing_begin_date": assessment.get("TBD"),
-                    # "external_testing_end_date": assessment.get("TBD"),
-                    # "group": assessment.get("TBD"),
-                    # "internal_testing_begin_date": assessment.get("TBD"),
-                    # "internal_testing_city": assessment.get("TBD"),
-                    # "internal_testing_end_date": assessment.get("TBD"),
-                    "mgmt_req": assessment.get("Mgmt Req"),
-                    "roe_date": assessment.get("ROE Date"),
+                    "assessment_completed": assessment.get("resolved"),
+                    "assessment_summary": assessment.get("summary"),
+                    "assessment_type": assessment.get(
+                        "Assessment Type"
+                    ),  # Should be required; awaiting updates to source data
+                    "ci_systems": assessment.get("CI Systems"),
+                    "ci_type": assessment.get("CI Type"),
+                    "contractor_count": assessment.get("Contractor Operator Count"),
+                    "draft_completed": assessment.get("Draft Complete Date"),
+                    "election": assessment.get("Election"),
+                    "external_testing_begin": assessment.get(
+                        "External Testing Begin Date"
+                    ),
+                    "external_testing_end": assessment.get("External Testing End Date"),
+                    "fed_count": assessment.get("Fed Operator Count"),
+                    "fed_lead": assessment.get("Fed Lead"),
+                    "group_project": assessment.get("Group/Project"),
+                    "internal_testing_begin": assessment.get(
+                        "Internal Testing Begin Date"
+                    ),
+                    "internal_testing_city": assessment.get("Internal Testing City"),
+                    "internal_testing_end": assessment.get("Internal Testing End Date"),
+                    "last_change": assessment.get("updated"),
+                    "management_request": assessment.get(
+                        "Mgmt Req"
+                    ),  # Should be required; awaiting updates to source data
+                    "operators": assessment.get("Operators", []),
+                    "report_final_date": assessment.get("Report Final Date"),
+                    "requested_services": assessment.get("Requested Services", []),
                     "roe_number": assessment.get("ROE Number"),
                     "roe_signed": assessment.get("ROE Signed"),
-                    # "summary": assessment.get("Summary"),
-                    "asmt_name": assessment.get("Asmt Name"),
-                    # "requested_services": assessment.get("TBD"),
-                    "stakeholder_name": assessment.get("Stakeholder Name"),
-                    "state": assessment.get("State"),
-                    "testing_complete_date": assessment.get("Testing Complete Date"),
-                    # "testing_phase": assessment.get("TBD"),
-                    "election": assessment.get("Election"),  # TODO: Make real boolean
-                    "testing_sector": assessment.get("Testing Sector"),
-                    # "ci_type": assessment.get("TBD"),
-                    # "ci_systems": assessment.get("TBD"),
-                    "fed_lead": assessment.get("Fed Lead"),
-                    # "contractor_operator_count": assessment.get("TBD"),
-                    # "draft_poc_date": assessment.get("TBD"),
-                    # "fed_operator_count": assessment.get("TBD"),
-                    # "report_final_date": assessment.get("TBD"),
-                    # "operators": assessment.get("TBD"),
-                    # "stakeholder_id": assessment.get("TBD"),
-                    # "testing_begin_date": assessment.get("TBD")
+                    "roe_signed_date": assessment.get("ROE Date"),
+                    "sector": assessment.get(
+                        "Testing Sector"
+                    ),  # Should be required; awaiting updates to source data
+                    "stakeholder_state": assessment.get("State"),
+                    "testing_begin": assessment.get("Testing Begin Date"),
+                    "testing_complete": assessment.get("Testing Complete Date"),
+                    "testing_phase": assessment.get("Testing Phase"),
                 },
                 upsert=True,
             )
