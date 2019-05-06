@@ -207,18 +207,14 @@ def import_data(
                     "internal_testing_city": assessment.get("Internal Testing City"),
                     "internal_testing_end": assessment.get("Internal Testing End Date"),
                     "last_change": assessment.get("updated"),
-                    "management_request": assessment.get(
-                        "Mgmt Req"
-                    ),  # Should be required; awaiting updates to source data
+                    "management_request": assessment.get("Mgmt Req"),
                     "operators": assessment.get("Operators", []),
                     "report_final_date": assessment.get("Report Final Date"),
                     "requested_services": assessment.get("Requested Services", []),
                     "roe_number": assessment.get("ROE Number"),
                     "roe_signed": assessment.get("ROE Signed"),
                     "roe_signed_date": assessment.get("ROE Date"),
-                    "sector": assessment.get(
-                        "Testing Sector"
-                    ),  # Should be required; awaiting updates to source data
+                    "sector": assessment.get("Testing Sector"),
                     "stakeholder_state": assessment.get("State"),
                     "testing_begin": assessment.get("Testing Begin Date"),
                     "testing_complete": assessment.get("Testing Complete Date"),
