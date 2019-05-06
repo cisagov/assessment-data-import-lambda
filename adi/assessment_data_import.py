@@ -97,16 +97,13 @@ def import_data(
 
     Returns
     -------
-    bool : Returns a boolean indicating if the asssessment data import was
+    bool : Returns a boolean indicating if the assessment data import was
     successful.
 
     """
     # Boto3 clients for S3 and SSM
     s3_client = boto3_client("s3")
     ssm_client = boto3_client("ssm")
-
-    # TODO Add error checking?
-    # TODO Determine which fields are required vs. optional
 
     # Securely create a temporary file to store the JSON data in
     temp_file_descriptor, temp_assessment_filepath = tempfile.mkstemp()
