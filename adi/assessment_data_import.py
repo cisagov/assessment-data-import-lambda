@@ -178,6 +178,7 @@ def import_data(
                     "_id": assessment["id"],
                     "assessment_name": assessment["Asmt Name"],
                     "assessment_status": assessment["status"],
+                    "assessment_type": assessment["Assessment Type"],
                     "created": assessment["created"],
                     "stakeholder_name": assessment["Stakeholder Name"],
                     # Optional fields
@@ -186,9 +187,6 @@ def import_data(
                     "appendix_b_signed": assessment.get("Appendix B Signed"),
                     "assessment_completed": assessment.get("resolved"),
                     "assessment_summary": assessment.get("summary"),
-                    "assessment_type": assessment.get(
-                        "Assessment Type"
-                    ),  # Should be required; awaiting updates to source data
                     "ci_systems": assessment.get("CI Systems"),
                     "ci_type": assessment.get("CI Type"),
                     "contractor_count": assessment.get("Contractor Operator Count"),
