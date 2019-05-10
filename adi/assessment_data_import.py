@@ -97,16 +97,13 @@ def import_data(
 
     Returns
     -------
-    bool : Returns a boolean indicating if the asssessment data import was
+    bool : Returns a boolean indicating if the assessment data import was
     successful.
 
     """
     # Boto3 clients for S3 and SSM
     s3_client = boto3_client("s3")
     ssm_client = boto3_client("ssm")
-
-    # TODO Add error checking?
-    # TODO Determine which fields are required vs. optional
 
     # Securely create a temporary file to store the JSON data in
     temp_file_descriptor, temp_assessment_filepath = tempfile.mkstemp()
@@ -150,7 +147,21 @@ def import_data(
         # Iterate through assessment data and save each record to the database
         for assessment in assessment_data:
             # Convert dates to UTC datetimes
-            for date_field in ("ROE Date", "Testing Complete Date"):
+            for date_field in (
+                "Appendix A Date",
+                "created",
+                "Draft Complete Date",
+                "External Testing Begin Date",
+                "External Testing End Date",
+                "resolved",
+                "Internal Testing Begin Date",
+                "Internal Testing End Date",
+                "Report Final Date",
+                "ROE Date",
+                "Testing Begin Date",
+                "Testing Complete Date",
+                "updated",
+            ):
                 if assessment.get(date_field):
                     assessment[date_field] = datetime.datetime.strptime(
                         assessment[date_field], "%a, %d %b %Y %H:%M:%S %z"
@@ -160,46 +171,52 @@ def import_data(
                         - assessment[date_field].utcoffset()
                     )
 
-            db.rva.replace_one(
+            db.assessments.replace_one(
                 {"_id": assessment["id"]},
                 {
+                    # Required fields
                     "_id": assessment["id"],
-                    # "status": assessment.get("Status"),
-                    # "created": assessment.get("Created"),
-                    # "updated": assessment.get("Updated"),
-                    # "appendix_a_date": assessment.get("Appendix A Date"),
+                    "assessment_name": assessment["Asmt Name"],
+                    "assessment_status": assessment["status"],
+                    "assessment_type": assessment["Assessment Type"],
+                    "created": assessment["created"],
+                    "stakeholder_name": assessment["Stakeholder Name"],
+                    # Optional fields
                     "appendix_a_signed": assessment.get("Appendix A Signed"),
+                    "appendix_a_signed_date": assessment.get("Appendix A Date"),
                     "appendix_b_signed": assessment.get("Appendix B Signed"),
-                    "assessment_type": assessment.get("Assessment Type"),
-                    # "external_testing_begin_date": assessment.get("TBD"),
-                    # "external_testing_end_date": assessment.get("TBD"),
-                    # "group": assessment.get("TBD"),
-                    # "internal_testing_begin_date": assessment.get("TBD"),
-                    # "internal_testing_city": assessment.get("TBD"),
-                    # "internal_testing_end_date": assessment.get("TBD"),
-                    "mgmt_req": assessment.get("Mgmt Req"),
-                    "roe_date": assessment.get("ROE Date"),
+                    "assessment_completed": assessment.get("resolved"),
+                    "assessment_summary": assessment.get("summary"),
+                    "ci_systems": assessment.get("CI Systems"),
+                    "ci_type": assessment.get("CI Type"),
+                    "contractor_count": assessment.get("Contractor Operator Count"),
+                    "draft_completed": assessment.get("Draft Complete Date"),
+                    "election": assessment.get("Election"),
+                    "external_testing_begin": assessment.get(
+                        "External Testing Begin Date"
+                    ),
+                    "external_testing_end": assessment.get("External Testing End Date"),
+                    "fed_count": assessment.get("Fed Operator Count"),
+                    "fed_lead": assessment.get("Fed Lead"),
+                    "group_project": assessment.get("Group/Project"),
+                    "internal_testing_begin": assessment.get(
+                        "Internal Testing Begin Date"
+                    ),
+                    "internal_testing_city": assessment.get("Internal Testing City"),
+                    "internal_testing_end": assessment.get("Internal Testing End Date"),
+                    "last_change": assessment.get("updated"),
+                    "management_request": assessment.get("Mgmt Req"),
+                    "operators": assessment.get("Operators", []),
+                    "report_final_date": assessment.get("Report Final Date"),
+                    "requested_services": assessment.get("Requested Services", []),
                     "roe_number": assessment.get("ROE Number"),
                     "roe_signed": assessment.get("ROE Signed"),
-                    # "summary": assessment.get("Summary"),
-                    "asmt_name": assessment.get("Asmt Name"),
-                    # "requested_services": assessment.get("TBD"),
-                    "stakeholder_name": assessment.get("Stakeholder Name"),
-                    "state": assessment.get("State"),
-                    "testing_complete_date": assessment.get("Testing Complete Date"),
-                    # "testing_phase": assessment.get("TBD"),
-                    "election": assessment.get("Election"),  # TODO: Make real boolean
-                    "testing_sector": assessment.get("Testing Sector"),
-                    # "ci_type": assessment.get("TBD"),
-                    # "ci_systems": assessment.get("TBD"),
-                    "fed_lead": assessment.get("Fed Lead"),
-                    # "contractor_operator_count": assessment.get("TBD"),
-                    # "draft_poc_date": assessment.get("TBD"),
-                    # "fed_operator_count": assessment.get("TBD"),
-                    # "report_final_date": assessment.get("TBD"),
-                    # "operators": assessment.get("TBD"),
-                    # "stakeholder_id": assessment.get("TBD"),
-                    # "testing_begin_date": assessment.get("TBD")
+                    "roe_signed_date": assessment.get("ROE Date"),
+                    "sector": assessment.get("Testing Sector"),
+                    "stakeholder_state": assessment.get("State"),
+                    "testing_begin": assessment.get("Testing Begin Date"),
+                    "testing_complete": assessment.get("Testing Complete Date"),
+                    "testing_phase": assessment.get("Testing Phase"),
                 },
                 upsert=True,
             )
@@ -215,12 +232,13 @@ def import_data(
         # Delete local temp assessment data file regardless of whether or not
         # any exceptions were thrown in the try block above
         os.remove(f"{temp_assessment_filepath}")
-        logging.info(f"Deleted {data_filename} from local filesystem")
+        logging.info(f"Deleted temporary {data_filename} from local filesystem")
 
     return True
 
 
 def main():
+    """Set up logging and call the import_data function."""
     # Parse command line arguments
     args = docopt.docopt(__doc__, version=__version__)
 

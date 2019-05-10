@@ -1,3 +1,5 @@
+"""This module contains the lamdba_handler code."""
+
 import logging
 import os
 
