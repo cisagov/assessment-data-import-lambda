@@ -6,11 +6,11 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-VERSION_FILE=version.txt
+VERSION_FILE=adi/_version.py
 
 HELP_INFORMATION="bump_version.sh (show|major|minor|patch|prerelease|build|finalize)"
 
-old_version=$(cat $VERSION_FILE)
+old_version=$(grep __version__ $VERSION_FILE | grep -o '".*"' | sed 's/"//g')
 
 if [ $# -ne 1 ]
 then
