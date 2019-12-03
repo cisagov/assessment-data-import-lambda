@@ -39,6 +39,7 @@ import datetime
 import json
 import logging
 import os
+import sys
 import tempfile
 
 # Third-party libraries (install with pip)
@@ -48,7 +49,7 @@ from pymongo import MongoClient
 from pytz import utc
 
 # Local library
-from adi import __version__
+from ._version import __version__
 
 
 def import_data(
@@ -274,4 +275,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
