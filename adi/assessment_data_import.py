@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-"""assessment-data-import: A tool for importing assessment data.
+"""adi: A tool for importing assessment data.
 
 The source assessment data is a JSON file stored in an AWS S3 bucket.
 The destination of the data is a Mongo database.
 
 Usage:
-  assessment-data-import --s3-bucket=BUCKET --data-filename=FILE --db-hostname=HOST [--db-port=PORT] --ssm-db-name=DB --ssm-db-user=USER --ssm-db-password=PASSWORD [--log-level=LEVEL]
-  assessment-data-import (-h | --help)
+  adi --s3-bucket=BUCKET --data-filename=FILE --db-hostname=HOST [--db-port=PORT] --ssm-db-name=DB --ssm-db-user=USER --ssm-db-password=PASSWORD [--log-level=LEVEL]
+  adi (-h | --help)
 
 Options:
   -h --help                   Show this message.
