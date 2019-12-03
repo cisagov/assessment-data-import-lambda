@@ -206,6 +206,7 @@ def import_data(
                     "internal_testing_end": assessment.get("Internal Testing End Date"),
                     "last_change": assessment.get("updated"),
                     "management_request": assessment.get("Mgmt Req"),
+                    "mandated_category": assessment.get("Mandated Category"),
                     "operators": assessment.get("Operators", []),
                     "report_final_date": assessment.get("Report Final Date"),
                     "requested_services": assessment.get("Requested Services", []),
