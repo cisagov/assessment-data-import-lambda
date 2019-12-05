@@ -1,5 +1,5 @@
 #!/usr/bin/env pytest -vs
-"""Tests for example."""
+"""Tests for assessment data import (adi)."""
 
 import os
 import sys
