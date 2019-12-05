@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-"""assessment-data-import: A tool for importing assessment data.
+"""adi: A tool for importing assessment data.
 
 The source assessment data is a JSON file stored in an AWS S3 bucket.
 The destination of the data is a Mongo database.
 
 Usage:
-  assessment-data-import --s3-bucket=BUCKET --data-filename=FILE --db-hostname=HOST [--db-port=PORT] --ssm-db-name=DB --ssm-db-user=USER --ssm-db-password=PASSWORD [--log-level=LEVEL]
-  assessment-data-import (-h | --help)
+  adi --s3-bucket=BUCKET --data-filename=FILE --db-hostname=HOST [--db-port=PORT] --ssm-db-name=DB --ssm-db-user=USER --ssm-db-password=PASSWORD [--log-level=LEVEL]
+  adi (-h | --help)
 
 Options:
   -h --help                   Show this message.
@@ -39,6 +39,7 @@ import datetime
 import json
 import logging
 import os
+import sys
 import tempfile
 
 # Third-party libraries (install with pip)
@@ -48,7 +49,7 @@ from pymongo import MongoClient
 from pytz import utc
 
 # Local library
-from adi import __version__
+from ._version import __version__
 
 
 def import_data(
@@ -206,6 +207,7 @@ def import_data(
                     "internal_testing_end": assessment.get("Internal Testing End Date"),
                     "last_change": assessment.get("updated"),
                     "management_request": assessment.get("Mgmt Req"),
+                    "mandated_category": assessment.get("Mandated Category"),
                     "operators": assessment.get("Operators", []),
                     "report_final_date": assessment.get("Report Final Date"),
                     "requested_services": assessment.get("Requested Services", []),
@@ -273,4 +275,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

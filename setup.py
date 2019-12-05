@@ -5,21 +5,33 @@ Based on:
 
 - https://packaging.python.org/distributing/
 - https://github.com/pypa/sampleproject/blob/master/setup.py
+- https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
 """
+
+from glob import glob
+from os.path import splitext, basename
 
 from setuptools import setup
 
 
 def readme():
     """Read in and return the contents of the project's README.md file."""
-    with open("README.md") as f:
+    with open("README.md", encoding="utf-8") as f:
         return f.read()
+
+
+def package_vars(version_file):
+    """Read in and return the variables defined by the version_file."""
+    pkg_vars = {}
+    with open(version_file) as f:
+        exec(f.read(), pkg_vars)  # nosec
+    return pkg_vars
 
 
 setup(
     name="adi",
     # Versions should comply with PEP440
-    version="1.0.0",
+    version=package_vars("adi/_version.py")["__version__"],
     description="Imports assessment data to a Mongo database",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -51,8 +63,9 @@ setup(
     # What does your project relate to?
     keywords="adi assessment import",
     packages=["adi"],
-    install_requires=["docopt"],
-    extras_require={"test": ["pre-commit"]},
+    py_modules=[splitext(basename(path))[0] for path in glob("adi/*.py")],
+    install_requires=["boto3", "docopt", "pymongo", "pytz", "setuptools"],
+    extras_require={"test": ["pre-commit", "pytest", "pytest-cov", "coveralls"]},
     # Conveniently allows one to run the CLI tool as `example`
     entry_points={"console_scripts": ["adi = adi.assessment_data_import:main"]},
 )
