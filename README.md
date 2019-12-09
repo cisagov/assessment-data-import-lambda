@@ -10,9 +10,18 @@
 that reads assessment data from a JSON file in an S3 bucket and imports it
 into a database.
 
-## Example ##
+## Building the AWS Lambda zip file ##
 
-Building the AWS Lambda zip file:
+### Via a GitHub Release ###
+
+This repository is configured with a
+[GitHub Actions](https://github.com/features/actions) release workflow that
+will automatically generate the Lambda zip file whenever a new release is
+created.  The `assessment-data-import.zip` file can be found in the list of
+assets attached to each
+[release](https://github.com/cisagov/assessment-data-import-lambda/releases).
+
+### Manually ###
 
 1. `cd ~/cisagov/assessment-data-import-lambda`
 1. `docker-compose down`
