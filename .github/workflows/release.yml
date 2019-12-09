@@ -22,7 +22,7 @@ jobs:
       - name: Generate lambda zip
         run: docker-compose up
       - name: Upload lambda zip as release asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: assessment-data-import.zip
