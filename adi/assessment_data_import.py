@@ -218,7 +218,7 @@ def import_data(
                     "stakeholder_state": assessment.get("State"),
                     "testing_begin": assessment.get("Testing Begin Date"),
                     "testing_complete": assessment.get("Testing Complete Date"),
-                    "testing_phase": assessment.get("Testing Phase"),
+                    "testing_phase": assessment.get("Testing Phase", []),
                 },
                 upsert=True,
             )
