@@ -33,7 +33,7 @@ pip install --upgrade pip setuptools
 ###
 # Install local assessment data import (adi) module
 ###
-pip install -requirement requirements.txt
+pip install --requirement requirements.txt
 
 ###
 # Install other requirements
