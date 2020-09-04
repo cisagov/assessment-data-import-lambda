@@ -34,7 +34,7 @@ Options:
                               [default: warning]
 """
 
-# Standard libraries
+# Standard Python Libraries
 import datetime
 import json
 import logging
@@ -42,11 +42,12 @@ import os
 import sys
 import tempfile
 
-# Third-party libraries (install with pip)
+# Third-Party Libraries
 from boto3 import client as boto3_client
 import docopt
 from pymongo import MongoClient
 from pytz import utc
+
 
 # Local library
 from ._version import __version__

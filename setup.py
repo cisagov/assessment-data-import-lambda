@@ -13,7 +13,7 @@ from glob import glob
 from os.path import basename, splitext
 
 # Third-Party Libraries
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 def readme():
