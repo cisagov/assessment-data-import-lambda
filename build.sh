@@ -62,7 +62,7 @@ BUILD_DIR=/build
 ###
 cp -rT $VENV_DIR/lib/python3.8/site-packages/ $BUILD_DIR
 cp -rT $VENV_DIR/lib64/python3.8/site-packages/ $BUILD_DIR
-cp -r eal $BUILD_DIR
+cp -r adi $BUILD_DIR
 cp lambda_handler.py $BUILD_DIR
 
 ###
@@ -78,6 +78,5 @@ if [ -e $OUTPUT_DIR/$ZIP_FILE ]
 then
     rm $OUTPUT_DIR/$ZIP_FILE
 fi
-
 cd $BUILD_DIR
 zip -rq9 $OUTPUT_DIR/$ZIP_FILE .
