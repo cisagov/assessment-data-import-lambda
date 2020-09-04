@@ -36,6 +36,11 @@ image is very fast (due to Docker's caching) if the script has not changed, it
 is a very good idea to _always_ run the `docker-compose build` step when
 using this tool.
 
+## Contributing ##
+
+We welcome contributions!  Please see [here](CONTRIBUTING.md) for
+details.
+
 ## License ##
 
 This project is in the worldwide [public domain](LICENSE).

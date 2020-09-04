@@ -1,5 +1,6 @@
 """This module contains the lamdba_handler code."""
 
+# Standard Python Libraries
 import logging
 import os
 
@@ -34,6 +35,7 @@ from adi import assessment_data_import as adi
 # and
 # https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
 # for more details.
+
 root = logging.getLogger()
 if root.handlers:
     for handler in root.handlers:
