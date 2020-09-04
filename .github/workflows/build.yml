@@ -136,11 +136,6 @@ jobs:
         run: docker-compose build
       - name: Generate lambda zip
         run: docker-compose up
-      # We have to unzip the produced lambda zip because the upload-artifact
-      # action will compress whatever is at/in the provided path. This results
-      # in a zipped zip file.
-      - name: Unzip produced zip
-        run: unzip assessment-data-import.zip -d lambda_zip_contents
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
