@@ -1,7 +1,10 @@
 """This module contains the lamdba_handler code."""
 
+# Standard Python Libraries
 import logging
 import os
+
+# cisagov Libraries
 
 # Local module
 from adi import assessment_data_import as adi
@@ -34,10 +37,11 @@ from adi import assessment_data_import as adi
 # and
 # https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
 # for more details.
-root = logging.getLogger()
-if root.handlers:
-    for handler in root.handlers:
-        root.removeHandler(handler)
+
+logging_root = logging.getLogger()
+if logging_root.handlers:
+    for logging_handler in logging_root.handlers:
+        logging_root.removeHandler(logging_handler)
 
         # Set up logging
         log_level = logging.INFO

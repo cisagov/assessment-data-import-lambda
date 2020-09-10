@@ -1,12 +1,15 @@
 #!/usr/bin/env pytest -vs
 """Tests for assessment data import (adi)."""
 
+# Standard Python Libraries
 import os
 import sys
 from unittest.mock import patch
 
+# Third-Party Libraries
 import pytest
 
+# cisagov Libraries
 from adi import assessment_data_import as adi
 
 # define sources of version string
