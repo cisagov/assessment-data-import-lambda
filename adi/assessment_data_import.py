@@ -147,6 +147,32 @@ def import_data(
 
         # Iterate through assessment data and save each record to the database
         for assessment in assessment_data:
+            # Check for the most required of fields
+            if "id" not in assessment:
+                logging.warning("Assessment missing 'id'! Skipping...")
+                pass
+
+            # Ensure other required fields are present
+            missing_fields = [
+                k
+                for k in (
+                    "Asmt Name",
+                    "Assessment Type",
+                    "created",
+                    "Stakeholder Name",
+                    "status",
+                )
+                if k not in assessment
+            ]
+            if missing_fields:
+                logging.warning(
+                    f"'{assessment['id']}' is missing the following required field(s):"
+                )
+                for field in missing_fields:
+                    logging.warning(f"Missing field '{field}'")
+                logging.warning("Skipping...")
+                pass
+
             # Convert dates to UTC datetimes
             for date_field in (
                 "Appendix A Date",
