@@ -48,7 +48,6 @@ import docopt
 from pymongo import MongoClient
 from pytz import utc
 
-
 # Local library
 from ._version import __version__
 

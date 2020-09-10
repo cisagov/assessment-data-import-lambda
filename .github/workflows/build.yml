@@ -31,6 +31,7 @@ jobs:
             ${{ env.PRE_COMMIT_CACHE_DIR }}
           key: "lint-${{ runner.os }}-py${{ env.PY_VERSION }}-\
             ${{ hashFiles('**/requirements-test.txt') }}-\
+            ${{ hashFiles('**/requirements.txt') }}-\
             ${{ hashFiles('**/.pre-commit-config.yaml') }}"
           restore-keys: |
             lint-${{ runner.os }}-py${{ env.PY_VERSION }}-
@@ -58,7 +59,8 @@ jobs:
         with:
           path: ${{ env.PIP_CACHE_DIR }}
           key: "test-${{ runner.os }}-py${{ matrix.python-version }}-\
-            ${{ hashFiles('**/requirements-test.txt') }}"
+            ${{ hashFiles('**/requirements-test.txt') }}-\
+            ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
             test-${{ runner.os }}-py${{ matrix.python-version }}-
             test-${{ runner.os }}-
@@ -102,7 +104,7 @@ jobs:
       - name: Build artifacts
         run: python3 setup.py sdist bdist_wheel
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist-${{ matrix.python-version }}
           path: dist
@@ -111,23 +113,22 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.8
       - name: Store installed Python version
         run: |
           echo "::set-env name=PY_VERSION::"\
           "$(python -c "import platform;print(platform.python_version())")"
-      - name: Cache pip build requirements
-        uses: actions/cache@v1
+      - name: Cache lambda building environments
+        uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "${{ runner.os }}-pip-build-py${{ env.PY_VERSION }}-\
+          key: "build_lambda-${{ runner.os }}-py${{ env.PY_VERSION }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            ${{ runner.os }}-pip-build-py${{ env.PY_VERSION }}-
-            ${{ runner.os }}-pip-build-
-            ${{ runner.os }}-pip-
+            build_lambda-${{ runner.os }}-py${{ env.PY_VERSION }}-
+            build_lambda-${{ runner.os }}-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
@@ -136,13 +137,17 @@ jobs:
         run: docker-compose build
       - name: Generate lambda zip
         run: docker-compose up
-      # We have to unzip the produced lambda zip because the upload-artifact
-      # action will compress whatever is at/in the provided path. This results
-      # in a zipped zip file.
+      # We have to unzip the produced lambda zip because of limitations with the
+      # GitHub UI. Any files uploaded are packaged into a single zip to allow a
+      # user to download the artifacts of a build. This issue:
+      # https://github.com/actions/upload-artifact/issues/14
+      # is the best source for possible updates. Once the UI is updated we will
+      # most likely be able leverage the functionality of upload-artifact v2(+)
+      # to upload a single file as an artifact.
       - name: Unzip produced zip
         run: unzip assessment-data-import.zip -d lambda_zip_contents
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
-          name: assessment-data-import
+          name: assessment-data-import-py${{ env.PY_VERSION }}
           path: lambda_zip_contents/

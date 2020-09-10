@@ -5,8 +5,6 @@ import logging
 import os
 
 # cisagov Libraries
-
-# Local module
 from adi import assessment_data_import as adi
 
 # This Lambda function expects the following environment variables to be
