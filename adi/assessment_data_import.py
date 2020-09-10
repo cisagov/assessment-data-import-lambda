@@ -150,7 +150,7 @@ def import_data(
             # Check for the most required of fields
             if "id" not in assessment:
                 logging.warning("Assessment missing 'id'! Skipping...")
-                pass
+                continue
 
             # Ensure other required fields are present
             missing_fields = [
@@ -171,7 +171,7 @@ def import_data(
                 for field in missing_fields:
                     logging.warning(f"Missing field '{field}'")
                 logging.warning("Skipping...")
-                pass
+                continue
 
             # Convert dates to UTC datetimes
             for date_field in (
