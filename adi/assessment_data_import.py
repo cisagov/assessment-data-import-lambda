@@ -112,14 +112,14 @@ def import_data(
     try:
         # Fetch assessment data file from S3 bucket
         s3_client.download_file(
-            Bucket=s3_bucket, Key=data_filename, Filename=f"{temp_assessment_filepath}"
+            Bucket=s3_bucket, Key=data_filename, Filename=temp_assessment_filepath
         )
-        logging.info(f"Retrieved {data_filename} from S3 bucket {s3_bucket}")
+        logging.info("Retrieved %s from S3 bucket %s", data_filename, s3_bucket)
 
         # Load assessment data JSON
-        with open(f"{temp_assessment_filepath}") as assessment_json_file:
+        with open(temp_assessment_filepath) as assessment_json_file:
             assessment_data = json.load(assessment_json_file)
-        logging.info(f"JSON data loaded from {data_filename}")
+        logging.info("JSON data loaded from %s", data_filename)
 
         # Fetch database credentials from AWS SSM
         db_info = dict()
@@ -142,11 +142,39 @@ def import_data(
         db_connection = MongoClient(host=db_uri, tz_aware=True)
         db = db_connection[db_info["db_name"]]
         logging.info(
-            f"DB connection set up to {db_hostname}:{db_port}/" f"{db_info['db_name']}"
+            "DB connection set up to %s:%d/%s", db_hostname, db_port, db_info["db_name"]
         )
 
         # Iterate through assessment data and save each record to the database
-        for assessment in assessment_data:
+        for index, assessment in enumerate(assessment_data):
+            # Check for the most required of fields
+            if "id" not in assessment:
+                logging.warning(
+                    "Assessment at index %d missing 'id'! Skipping...", index
+                )
+                continue
+
+            # Ensure other required fields are present
+            missing_fields = [
+                k
+                for k in (
+                    "Asmt Name",
+                    "Assessment Type",
+                    "created",
+                    "Stakeholder Name",
+                    "status",
+                )
+                if k not in assessment
+            ]
+            if missing_fields:
+                logging.warning(
+                    "'%s' is missing the following required field(s):", assessment["id"]
+                )
+                for field in missing_fields:
+                    logging.warning("Missing field '%s'", field)
+                logging.warning("Skipping...")
+                continue
+
             # Convert dates to UTC datetimes
             for date_field in (
                 "Appendix A Date",
@@ -223,18 +251,18 @@ def import_data(
                 upsert=True,
             )
         logging.info(
-            f"{len(assessment_data)} assessment documents "
-            "successfully inserted/updated in database"
+            "%d assessment documents successfully inserted/updated in database",
+            len(assessment_data),
         )
 
         # Delete assessment data object from S3 bucket
         s3_client.delete_object(Bucket=s3_bucket, Key=data_filename)
-        logging.info(f"Deleted {data_filename} from S3 bucket {s3_bucket}")
+        logging.info("Deleted %s from S3 bucket %s", data_filename, s3_bucket)
     finally:
         # Delete local temp assessment data file regardless of whether or not
         # any exceptions were thrown in the try block above
-        os.remove(f"{temp_assessment_filepath}")
-        logging.info(f"Deleted temporary {data_filename} from local filesystem")
+        os.remove(temp_assessment_filepath)
+        logging.info("Deleted temporary %s from local filesystem", data_filename)
 
     return True
 
@@ -252,8 +280,9 @@ def main():
         )
     except ValueError:
         logging.critical(
-            f'"{log_level}" is not a valid logging level.  Possible values '
-            "are debug, info, warning, error, and critical."
+            "'%s' is not a valid logging level. Possible values are debug, "
+            + "info, warning, error, and critical.",
+            log_level,
         )
         return 1
 

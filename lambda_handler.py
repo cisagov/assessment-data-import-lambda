@@ -50,7 +50,7 @@ if logging_root.handlers:
 
 def handler(event, context):
     """Handle all Lambda events."""
-    logging.debug("AWS Event was: {}".format(event))
+    logging.debug("AWS Event was: %s", event)
 
     # Get info in the S3 event notification message from
     # the parent Lambda function.
@@ -76,14 +76,14 @@ def handler(event, context):
             )
         else:
             logging.warning(
-                "Expected ObjectCreated event from S3 bucket "
-                f"{os.environ['s3_bucket']} "
-                f"with key {os.environ['data_filename']}, but "
-                "received event from S3 bucket "
-                f"{record['s3']['bucket']['name']} with key "
-                f"{record['s3']['object']['key']}"
+                "Expected ObjectCreated event from S3 bucket %s with key %s, "
+                + "but received event from S3 bucket %s with key %s",
+                os.environ["s3_bucket"],
+                os.environ["data_filename"],
+                record["s3"]["bucket"]["name"],
+                record["s3"]["object"]["key"],
             )
-            logging.warning("Full AWS event: {}".format(event))
+            logging.warning("Full AWS event: %s", event)
     else:
-        logging.warning("Unexpected eventName received: {}".format(record["eventName"]))
-        logging.warning("Full AWS event: {}".format(event))
+        logging.warning("Unexpected eventName received: %s", record["eventName"])
+        logging.warning("Full AWS event: %s", event)
