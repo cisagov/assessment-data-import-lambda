@@ -146,10 +146,12 @@ def import_data(
         )
 
         # Iterate through assessment data and save each record to the database
-        for assessment in assessment_data:
+        for index, assessment in enumerate(assessment_data):
             # Check for the most required of fields
             if "id" not in assessment:
-                logging.warning("Assessment missing 'id'! Skipping...")
+                logging.warning(
+                    "Assessment at index %d missing 'id'! Skipping...", index
+                )
                 continue
 
             # Ensure other required fields are present
