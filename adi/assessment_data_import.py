@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """adi: A tool for importing assessment data.
 
 The source assessment data is a JSON file stored in an AWS S3 bucket.
@@ -39,7 +37,6 @@ import datetime
 import json
 import logging
 import os
-import sys
 import tempfile
 
 # Third-Party Libraries
@@ -301,7 +298,3 @@ def main():
     logging.shutdown()
 
     return result
-
-
-if __name__ == "__main__":
-    sys.exit(main())
