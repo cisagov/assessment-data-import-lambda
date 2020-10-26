@@ -62,6 +62,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     python_requires=">=3.6",
     # What does your project relate to?
@@ -84,6 +85,6 @@ setup(
             "pytest",
         ]
     },
-    # Conveniently allows one to run the CLI tool as `example`
+    # Conveniently allows one to run the CLI tool as `adi`
     entry_points={"console_scripts": ["adi = adi.assessment_data_import:main"]},
 )
