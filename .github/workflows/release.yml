@@ -14,21 +14,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - id: setup-python
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Store installed Python version
-        run: |
-          echo "::set-env name=PY_VERSION::"\
-          "$(python -c "import platform;print(platform.python_version())")"
       - name: Cache lambda building environments
         uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "release-${{ runner.os }}-py${{ env.PY_VERSION }}-\
+          key: "release-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            release-${{ runner.os }}-py${{ env.PY_VERSION }}-
+            release-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-
             release-${{ runner.os }}-
       - name: Install dependencies
         run: |

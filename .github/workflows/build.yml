@@ -16,26 +16,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - id: setup-python
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Store installed Python version
-        run: |
-          echo "PY_VERSION="\
-          "$(python -c "import platform;print(platform.python_version())")" \
-          >> $GITHUB_ENV
       - name: Cache linting environments
         uses: actions/cache@v2
         with:
           path: |
             ${{ env.PIP_CACHE_DIR }}
             ${{ env.PRE_COMMIT_CACHE_DIR }}
-          key: "lint-${{ runner.os }}-py${{ env.PY_VERSION }}-\
+          key: |
+            lint-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-\
             ${{ hashFiles('**/requirements-test.txt') }}-\
             ${{ hashFiles('**/requirements.txt') }}-\
             ${{ hashFiles('**/.pre-commit-config.yaml') }}"
           restore-keys: |
-            lint-${{ runner.os }}-py${{ env.PY_VERSION }}-
+            lint-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-
             lint-${{ runner.os }}-
       - name: Install dependencies
         run: |
@@ -59,11 +58,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "test-${{ runner.os }}-py${{ matrix.python-version }}-\
+          key: "test-${{ runner.os }}-\
+            py${{ matrix.python-version }}-\
             ${{ hashFiles('**/requirements-test.txt') }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            test-${{ runner.os }}-py${{ matrix.python-version }}-
+            test-${{ runner.os }}-\
+            py${{ matrix.python-version }}-
             test-${{ runner.os }}-
       - name: Install dependencies
         run: |
@@ -93,10 +94,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "build-${{ runner.os }}-py${{ matrix.python-version }}-\
+          key: "build-${{ runner.os }}-\
+            py${{ matrix.python-version }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            build-${{ runner.os }}-py${{ matrix.python-version }}-
+            build-${{ runner.os }}-\
+            py${{ matrix.python-version }}-
             build-${{ runner.os }}-
       - name: Install dependencies
         run: |
@@ -114,21 +117,20 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - id: setup-python
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Store installed Python version
-        run: |
-          echo "::set-env name=PY_VERSION::"\
-          "$(python -c "import platform;print(platform.python_version())")"
       - name: Cache lambda building environments
         uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "build_lambda-${{ runner.os }}-py${{ env.PY_VERSION }}-\
+          key: "build_lambda-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            build_lambda-${{ runner.os }}-py${{ env.PY_VERSION }}-
+            build_lambda-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-
             build_lambda-${{ runner.os }}-
       - name: Install dependencies
         run: |
@@ -150,5 +152,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: assessment-data-import-py${{ env.PY_VERSION }}
+          name: "assessment-data-import-\
+            py${{ steps.setup-python.outputs.python-version }}"
           path: lambda_zip_contents/
