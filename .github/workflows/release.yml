@@ -6,35 +6,24 @@ on:
     types: [prereleased, released]
 
 env:
-  ASSET_NAME: assessment-data-import.zip
   PIP_CACHE_DIR: ~/.cache/pip
-
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Versions supported by AWS and lambci/lambda images
+        python-version: [3.6, 3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Cache lambda building environments
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.PIP_CACHE_DIR }}
-          key: "release-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-\
-            ${{ hashFiles('**/requirements.txt') }}"
-          restore-keys: |
-            release-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-
-            release-${{ runner.os }}-
-      - name: Install dependencies
+      - name: Build Docker image
+        # DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
+        # image per:
+        # https://docs.docker.com/develop/develop-images/build_enhancements/
         run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade --requirement requirements.txt
-      - name: Build environment
-        run: docker-compose build
+          DOCKER_BUILDKIT=1 docker-compose build \
+            --build-arg PY_VERSION=${{ matrix.python-version }} \
+            --build-arg FILE_NAME=${{ github.event.repository.name }}
       - name: Generate lambda zip
         run: docker-compose up
       - name: Upload lambda zip as release asset
@@ -43,6 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.ASSET_NAME }}
-          asset_name: ${{ env.ASSET_NAME }}
+          asset_path: "${{ github.event.repository.name }}.zip"
+          asset_name: "${{ github.event.repository.name }}-\
+            py${{ matrix.python-version }}.zip"
           asset_content_type: application/zip
