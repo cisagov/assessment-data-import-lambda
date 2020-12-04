@@ -20,22 +20,20 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Cache linting environments
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
+        env:
+          BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-"
         with:
           path: |
             ${{ env.PIP_CACHE_DIR }}
             ${{ env.PRE_COMMIT_CACHE_DIR }}
-          key: |
-            lint-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-\
+          key: "${{ env.BASE_CACHE_KEY }}\
             ${{ hashFiles('**/requirements-test.txt') }}-\
             ${{ hashFiles('**/requirements.txt') }}-\
             ${{ hashFiles('**/.pre-commit-config.yaml') }}"
           restore-keys: |
-            lint-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-
-            lint-${{ runner.os }}-
+            ${{ env.BASE_CACHE_KEY }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -51,21 +49,21 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - id: setup-python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Cache testing environments
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
+        env:
+          BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-"
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "test-${{ runner.os }}-\
-            py${{ matrix.python-version }}-\
+          key: "${{ env.BASE_CACHE_KEY }}\
             ${{ hashFiles('**/requirements-test.txt') }}-\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            test-${{ runner.os }}-\
-            py${{ matrix.python-version }}-
-            test-${{ runner.os }}-
+            ${{ env.BASE_CACHE_KEY }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -87,20 +85,20 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - id: setup-python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Cache building environments
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
+        env:
+          BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
+            py${{ steps.setup-python.outputs.python-version }}-"
         with:
           path: ${{ env.PIP_CACHE_DIR }}
-          key: "build-${{ runner.os }}-\
-            py${{ matrix.python-version }}-\
+          key: "${{ env.BASE_CACHE_KEY }}\
             ${{ hashFiles('**/requirements.txt') }}"
           restore-keys: |
-            build-${{ runner.os }}-\
-            py${{ matrix.python-version }}-
-            build-${{ runner.os }}-
+            ${{ env.BASE_CACHE_KEY }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
@@ -115,29 +113,23 @@ jobs:
   build_lambda:
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      matrix:
+        # Versions supported by AWS and lambci/lambda images
+        python-version: [3.6, 3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Cache lambda building environments
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.PIP_CACHE_DIR }}
-          key: "build_lambda-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-\
-            ${{ hashFiles('**/requirements.txt') }}"
-          restore-keys: |
-            build_lambda-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-
-            build_lambda-${{ runner.os }}-
-      - name: Install dependencies
+      - name: Get short SHA for the commit being used
         run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade --requirement requirements.txt
-      - name: Build environment
-        run: docker-compose build
+          echo "GH_SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+      - name: Build Docker image
+        # DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
+        # image per:
+        # https://docs.docker.com/develop/develop-images/build_enhancements/
+        run: |
+          DOCKER_BUILDKIT=1 docker-compose build \
+            --build-arg PY_VERSION=${{ matrix.python-version }} \
+            --build-arg FILE_NAME=${{ github.event.repository.name }}
       - name: Generate lambda zip
         run: docker-compose up
       # We have to unzip the produced lambda zip because of limitations with the
@@ -146,12 +138,17 @@ jobs:
       # https://github.com/actions/upload-artifact/issues/14
       # is the best source for possible updates. Once the UI is updated we will
       # most likely be able leverage the functionality of upload-artifact v2(+)
-      # to upload a single file as an artifact.
-      - name: Unzip produced zip
-        run: unzip assessment-data-import.zip -d lambda_zip_contents
+      # to upload a single file as an artifact. Until then we extract the
+      # contents to the "lambda_zip_contents" directory to let
+      # actions/upload-artifacts repackage them for availability on GitHub.
+      - name: Unzip generated zip
+        run: |
+          unzip ${{ github.event.repository.name }}.zip \
+            -d lambda_zip_contents
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: "assessment-data-import-\
-            py${{ steps.setup-python.outputs.python-version }}"
+          name: "${{ github.event.repository.name }}-\
+            py${{ matrix.python-version }}-\
+            ${{ env.GH_SHORT_SHA }}"
           path: lambda_zip_contents/
