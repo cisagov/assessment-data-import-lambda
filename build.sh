@@ -95,12 +95,12 @@ cp lambda_handler.py "$BUILD_DIR"
 OUTPUT_DIR="/output"
 if [ ! -d "$OUTPUT_DIR" ]
 then
-    mkdir "$OUTPUT_DIR"
+  mkdir "$OUTPUT_DIR"
 fi
 
 if [ -e "$OUTPUT_DIR/$ZIP_FILE" ]
 then
-    rm "$OUTPUT_DIR/$ZIP_FILE"
+  rm "$OUTPUT_DIR/$ZIP_FILE"
 fi
 cd $BUILD_DIR
 # Recursively (-r) add the current directory to the specified output filename
