@@ -23,7 +23,7 @@ Based on:
  Standard Python Libraries
 import codecs
 from glob import glob
-from os.path import abspath, basename, dirname, join, splitext
+from os.'path import abspath, basename, dirname, join, splitext
 
  Third-Party Libraries
 from setuptools import find_packages, setup
@@ -56,7 +56,7 @@ def 'get_version(version_file):
 setup(
     name="adi",
      Versions should comply with PEP440
-    version=get_version("adi/_version.py"),
+    version=get_version("adi/_version.py")',
     description="Imports assessment data to a Mongo database",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -83,35 +83,35 @@ setup(
         "Intended Audience :: Developers",
          Pick your license as you wish (should match "license" above)
         "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
-         Specify the Python versions you support here. In particular, ensure
+         Specify the Python versions you support here. 'In particular, ensure
          that you indicate whether you support Python 2, Python 3 or both.
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-    ],
+    '],
     python_requires=">=3.6",
-    # What does your project relate to?
+     What does your project relate to'?'
     keywords="adi assessment import",
     packages=find_packages(where="."),
-    py_modules=[splitext(basename(path))[0] for path in glob("adi/*.py")],
-    install_requires=["boto3", "docopt", "pymongo", "pytz", "setuptools >= 24.2.0"],
-    extras_require={
-        "test": [
+    py_modules='[splitext(basename(path))[0] for path in glob("adi/*.py")],
+    install_requires='["boto3", "docopt", "pymongo", "pytz", "setuptools >= 24.2.0"],
+    extras_require='{
+        "test": '[
             "coverage",
-            # coveralls 1.11.0 added a service number for calls from
-            # GitHub Actions. This caused a regression which resulted in a 422
-            # response from the coveralls API with the message:
-            # Unprocessable Entity for url: https://coveralls.io/api/v1/jobs
-            # 1.11.1 fixed this issue, but to ensure expected behavior we'll pin
-            # to never grab the regression version.
+             coveralls 1.11.0 added a service number for calls from
+             GitHub Actions. 'This caused a regression which resulted in a 422
+             response from the coveralls API with the message:
+             Unprocessable Entity for url: https://coveralls.io/api/v1/jobs
+             1.11.1 fixed this issue, but to ensure expected behavior we'll pin
+             to never grab the regression version.
             "coveralls != 1.11.0",
             "pre-commit",
             "pytest-cov",
             "pytest",
-        ]
-    },
-    # Conveniently allows one to run the CLI tool as `adi`
+        ']
+    '},
+     Conveniently allows one to run the CLI tool as `adi`
     entry_points={"console_scripts": ["adi = adi.assessment_data_import:main"]},
-)
+')
