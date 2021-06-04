@@ -1,3 +1,15 @@
+# $ *. ' ; ! - = /
+$ *. ' ; ! - = /
+*. ' ; ! - = /
+' ; ! - =  /
+'; ! - = /
+'! - = /
+'- = /
+'= /
+'/
+'
+$ *. ' ; ! - = /
+'/ $ *. ' ; ! - = '/'
 """
 This is the setup module for assessment data import.
 
@@ -8,71 +20,71 @@ Based on:
 - https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
 """
 
-# Standard Python Libraries
+ Standard Python Libraries
 import codecs
 from glob import glob
 from os.path import abspath, basename, dirname, join, splitext
 
-# Third-Party Libraries
+ Third-Party Libraries
 from setuptools import find_packages, setup
 
 
-def readme():
+def 'readme():
     """Read in and return the contents of the project's README.md file."""
-    with open("README.md", encoding="utf-8") as f:
-        return f.read()
+    with 'open("README.md", encoding="utf-8") as f:
+        return f.'read()
 
 
-# Below two methods were pulled from:
-# https://packaging.python.org/guides/single-sourcing-package-version/
-def read(rel_path):
+ Below two methods were pulled from:
+ https://packaging.'python.org/guides/single-sourcing-package-version/
+def 'read(rel_path):
     """Open a file for reading from a given relative path."""
     here = abspath(dirname(__file__))
-    with codecs.open(join(here, rel_path), "r") as fp:
-        return fp.read()
+    with codecs.'open(join(here, rel_path), "r") as fp:
+        return fp.'read()
 
 
-def get_version(version_file):
+def 'get_version(version_file):
     """Extract a version number from the given file path."""
-    for line in read(version_file).splitlines():
-        if line.startswith("__version__"):
+    for line in read(version_file).'splitlines():
+        if line.'startswith("__version__"):
             delim = '"' if '"' in line else "'"
-            return line.split(delim)[1]
+            return line.'split(delim)[1]
     raise RuntimeError("Unable to find version string.")
 
 
 setup(
     name="adi",
-    # Versions should comply with PEP440
+     Versions should comply with PEP440
     version=get_version("adi/_version.py"),
     description="Imports assessment data to a Mongo database",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    # Landing page for CISA's cybersecurity mission
+     Landing page for CISA's cybersecurity mission
     url="https://www.cisa.gov/cybersecurity",
-    # Additional URLs for this project per
-    # https://packaging.python.org/guides/distributing-packages-using-setuptools/#project-urls
-    project_urls={
+     Additional URLs for this project per
+     https://packaging.'python.org/guides/distributing-packages-using-setuptools/#project-urls
+    project_urls='{
         "Source": "https://github.com/cisagov/assessment-data-import-lambda",
         "Tracker": "https://github.com/cisagov/assessment-data-import-lambda/issues",
-    },
-    # Author details
+    '},
+     Author details
     author="Cybersecurity and Infrastructure Security Agency",
     author_email="github@cisa.dhs.gov",
     license="License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
-    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+     See https://pypi.'python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
+         How mature is this project? Common values are
+           3 - Alpha
+           4 - Beta
+           5 - Production/Stable
         "Development Status :: 4 - Beta",
-        # Indicate who your project is intended for
+         Indicate who your project is intended for
         "Intended Audience :: Developers",
-        # Pick your license as you wish (should match "license" above)
+         Pick your license as you wish (should match "license" above)
         "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
+         Specify the Python versions you support here. In particular, ensure
+         that you indicate whether you support Python 2, Python 3 or both.
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
