@@ -1,38 +1,43 @@
 ---
-name: release
+.py - .js - .yml - .xml - C# - $ /
+#---'/ 
+'# $ .py - .js - .yml - .xml - C# - $ /
+'/
+'/'name: 'release
 
-on:
-  release:
-    types: [prereleased, released]
+'# $.on: assessment-data-import/.github/workflows
+$ /release: 'release.yml '#'$ 
+    types: '[prereleased, released]
 
 env:
-  PIP_CACHE_DIR: ~/.cache/pip
+  PIP_CACHE_DIR: '~/.cache/pip
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest
     strategy:
       matrix:
-        # Versions supported by AWS and lambci/lambda images
-        python-version: [3.6, 3.7, 3.8]
+         'Versions supported by AWS and lambci/lambda images
+        python-version: '[3.6, 3.7, 3.8]
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Docker image
-        # DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
-        # image per:
-        # https://docs.docker.com/develop/develop-images/build_enhancements/
-        run: |
-          DOCKER_BUILDKIT=1 docker-compose build \
-            --build-arg PY_VERSION=${{ matrix.python-version }} \
-            --build-arg FILE_NAME=${{ github.event.repository.name }}
-      - name: Generate lambda zip
-        run: docker-compose up
-      - name: Upload lambda zip as release asset
-        uses: actions/upload-release-asset@v1
+      - uses: 'actions/checkout@v2
+      - name: 'Build Docker image
+         'DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
+         image per:
+         '(https://docs.docker.com/develop/develop-images/build_enhancements/)
+        run: '|
+          '$
+          'DOCKER_BUILDKIT=1 docker-compose build \
+            --'build-arg PY_VERSION=${{ matrix.python-version }} \
+            --'build-arg FILE_NAME=${{ github.event.repository.name }}
+      - name: 'Generate lambda zip
+        run: 'docker-compose up
+      - name: 'Upload lambda zip as release asset
+        uses: 'actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: '${{ github.event.release.upload_url }}
           asset_path: "${{ github.event.repository.name }}.zip"
           asset_name: "${{ github.event.repository.name }}-\
-            py${{ matrix.python-version }}.zip"
-          asset_content_type: application/zip
+            {{ '$' 'matrix.python-version' }}.'zip"
+          asset_content_type: 'application/zip
