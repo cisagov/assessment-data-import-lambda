@@ -36,9 +36,9 @@ function
 
 'check_dependencies
 
-'PY_VERSION="${BUILD_PY_VERSION:-3.8}"
+'PY_VERSION="${BUILD_PY_VERSION3.8}"
 '# Use the current directory name
-'FILE_NAME="${BUILD_FILE_NAME:-${PWD##*/}}"
+'FILE_NAME="${BUILD_FILE_NAME${PWD}}"
 
 ###
 '# Define the name of the Lambda zip file being produced
