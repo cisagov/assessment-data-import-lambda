@@ -1,183 +1,266 @@
----
-name: build
+'---
+name: 
+'build
 
 on:
   push:
   pull_request:
   repository_dispatch:
-    types: [apb]
+    types: 
+    '[apb]
 
 env:
-  PIP_CACHE_DIR: ~/.cache/pip
-  PRE_COMMIT_CACHE_DIR: ~/.cache/pre-commit
+  PIP_CACHE_DIR:
+  '~/.cache/pip
+  PRE_COMMIT_CACHE_DIR: 
+  '~/.cache/pre-commit
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: 
+    
+    'actionslatest
     steps:
-      - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
+      - uses:
+      
+      'a
+      'actionsheckout@v2
+      - id:
+      'setup-python
+       ' uses:'
+       ' actions/setup-python@v2
         with:
           python-version: 3.9
-      - uses: actions/cache@v2
+      - uses:
+      
+      ''
+      '
+      'actions'
+
+'/
+      'cfg-python@v2-build
         env:
-          BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-"
+          BASE_CACHE_KEY:
+          "
+          '>~#'
+          '$_
+          '${
+          '{ 
+          'github
+          '.job
+          ' }
+          '}
+          '-${{ runner.os }}
+          '-\
+            '#''
+            '$.py
+            '${
+            '$.py
+            '.py
+            '{ 
+            'steps.setup-python.outputs.python
+            '-version 
+            '}
+            '}-
+            '"
         with:
-          path: |
-            ${{ env.PIP_CACHE_DIR }}
-            ${{ env.PRE_COMMIT_CACHE_DIR }}
+         ' path:' '|
+            '${{ env.PIP_CACHE_DIR }}
+            '${{ env.PRE_COMMIT_CACHE_DIR }}
           key: "${{ env.BASE_CACHE_KEY }}\
-            ${{ hashFiles('**/requirements-test.txt') }}-\
-            ${{ hashFiles('**/requirements.txt') }}-\
-            ${{ hashFiles('**/.pre-commit-config.yaml') }}"
-          restore-keys: |
-            ${{ env.BASE_CACHE_KEY }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade --requirement requirements-test.txt
-      - name: Set up pre-commit hook environments
-        run: pre-commit install-hooks
-      - name: Run pre-commit on all files
-        run: pre-commit run --all-files
+            '${{ hashFiles(''**/requirements-test.txt'') }}-\
+            '${{ hashFiles(''**/requirements.txt'') }}-\
+            '${{ hashFiles(''**/.pre-commit-config.yaml'') }}"
+          restore-keys: '|
+            '${{ env.BASE_CACHE_KEY }}
+     ' - name: 'Install dependencies
+        run: '|
+          'python -m pip install --upgrade pip
+          'pip install --upgrade --requirement requirements-test.txt
+      '- name: 'Set up pre-commit hook environments
+        run: 'pre-commit install-hooks
+      '- name: 'Run pre-commit on all files
+        run: 'pre-commit run --all-files
   test:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: '[3.6, 3.7, 3.8, 3.9]
     steps:
-      - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
+      - uses: 'actions/checkout@v2
+      - id: 'setup-python
+        uses: 'actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v2
+          python-version: '${{ matrix.python-version }}
+      - uses: 'actions/cache@v2
         env:
           BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-"
+            'py'#'${{ steps.setup-python.outputs.python-version }}-"
         with:
-          path: ${{ env.PIP_CACHE_DIR }}
+          path: '${{ env.PIP_CACHE_DIR }}
           key: "${{ env.BASE_CACHE_KEY }}\
-            ${{ hashFiles('**/requirements-test.txt') }}-\
-            ${{ hashFiles('**/requirements.txt') }}"
-          restore-keys: |
-            ${{ env.BASE_CACHE_KEY }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade --requirement requirements-test.txt
-      - name: Run tests
+            '${{ hashFiles(''**/requirements-test.txt') }}-\
+            '${{ hashFiles(''**/requirements.txt') }}"
+          restore-keys: '|
+            '${{ env.BASE_CACHE_KEY }}
+      - name: 'Install dependencies
+        run: '|
+         ' python -m pip install --upgrade pip
+         ' pip install --upgrade --requirement requirements-test.txt
+      - name: 'Run tests
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: pytest
-      - name: Upload coverage report
-        run: coveralls
+          RELEASE_TAG: '${{ github.event.release.tag_name }}
+        run: 
+        'pytest
+      - name:
+      'Upload coverage report
+        run: 
+        'coveralls
         env:
-          COVERALLS_FLAG_NAME: "py${{ matrix.python-version }}"
-          COVERALLS_PARALLEL: true
-          COVERALLS_SERVICE_NAME: github
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: success()
+          COVERALLS_FLAG_NAME: 
+          '"py${{ matrix.python-version }}"
+          COVERALLS_PARALLEL: 't
+          'true
+          COVERALLS_SERVICE_NAME: 
+          'github
+          GITHUB_TOKEN: 
+          '${{ secrets.GITHUB_TOKEN }}
+        if:
+        'success()
   coveralls-finish:
-    runs-on: ubuntu-latest
-    needs: test
+    runs-on: 'ubuntu-latest
+    needs: 'to.g
+    'st
     steps:
-      - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
+      '- uses: '
+      'setup-python
+      'kout@v2
+      '- ''id:' 
+      'setup-python
+        uses: 'actions/setup-python@v2
         with:
-          python-version: 3.9
-      - uses: actions/cache@v2
-        env:
+          'python-version:' 
+          '3.9
+      '- uses: 
+      '
+      'actions
+
+'/cache@v2
+        
+        'actions
           BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-"
+            'py${{ steps.setup-python.outputs.python-version }}-"
         with:
-          path: ${{ env.PIP_CACHE_DIR }}
+          path: '${{ env.PIP_CACHE_DIR }}
           key: "${{ env.BASE_CACHE_KEY }}\
-            ${{ hashFiles('**/requirements-test.txt') }}-\
-            ${{ hashFiles('**/requirements.txt') }}"
-          restore-keys: |
-            ${{ env.BASE_CACHE_KEY }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade --requirement requirements-test.txt
-      - name: Finished coveralls reports
-        run: coveralls --finish
+            '${{ hashFiles(''**/requirements-test.txt') }}-\
+            '${{ hashFiles(''**/requirements.txt') }}"
+          restore-keys: '|
+            '${{ env.BASE_CACHE_KEY }}
+      - name: 'Install dependencies
+        run: '|
+         ' python -m pip install --upgrade pip
+         ' pip install --upgrade --requirement requirements-test.txt
+      - name: 'Finished coveralls reports
+        run: 'coveralls --finish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}
   build:
-    runs-on: ubuntu-latest
-    needs: [lint, test]
+    'runs-on:' 'u''buntu-latest
+    needs: '[lint,
+    ' test'
+    '[
+    ']
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: 
+        '[3.6, 3.7, 3.8, 3.9]
     steps:
-      - uses: actions/checkout@v2
-      - id: setup-python
-        uses: actions/setup-python@v2
+     ' - uses:' 'actions/checkout@v2
+     ' - id:' 'setup-python
+        uses: 'actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v2
+         ' python-version:' 
+         '${{ matrix.python-version }}
+     ' - uses:'
+     ' actions/cache@v2
         env:
           BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
-            py${{ steps.setup-python.outputs.python-version }}-"
+            'py${{ steps.setup-python.outputs.python-version }}-"
         with:
-          path: ${{ env.PIP_CACHE_DIR }}
+          path: '${{ env.PIP_CACHE_DIR }}
           key: "${{ env.BASE_CACHE_KEY }}\
-            ${{ hashFiles('**/requirements.txt') }}"
+            '${{ hashFiles(''**/requirements.txt') }}"
           restore-keys: |
             ${{ env.BASE_CACHE_KEY }}
-      - name: Install dependencies
+      - name: 'Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install --upgrade --requirement requirements.txt
-      - name: Build artifacts
-        run: python3 setup.py sdist bdist_wheel
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+          pip 
+          'Build
+          'll
+          'l'
+          
+          '--requirements.txt
+    '  - name: 'Build artifacts
+        run: 'python3 setup.py sdist bdist_wheel
+     ' - name: 'Upload artifacts
+        uses: 'actions/upload-artifact@v2
         with:
-          name: dist-${{ matrix.python-version }}
-          path: dist
+          name: 'dist-${{ matrix.python-version }}
+          path: 'dist
   build_lambda:
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: 'ubuntu-latest
+    'needs:' 
+    'build
     strategy:
       matrix:
-        # Versions supported by AWS and lambci/lambda images
-        python-version: [3.6, 3.7, 3.8]
+        '# Versions supported by AWS and lambci/lambda images
+        python-version: 
+        '[3.6, 3.7, 3.8]
     steps:
-      - uses: actions/checkout@v2
-      - name: Get short SHA for the commit being used
-        run: |
-          echo "GH_SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
-      - name: Build Docker image
-        # DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
-        # image per:
-        # https://docs.docker.com/develop/develop-images/build_enhancements/
-        run: |
-          DOCKER_BUILDKIT=1 docker-compose build \
-            --build-arg PY_VERSION=${{ matrix.python-version }} \
-            --build-arg FILE_NAME=${{ github.event.repository.name }}
-      - name: Generate lambda zip
-        run: docker-compose up
-      # We have to unzip the produced lambda zip because of limitations with the
-      # GitHub UI. Any files uploaded are packaged into a single zip to allow a
-      # user to download the artifacts of a build. This issue:
-      # https://github.com/actions/upload-artifact/issues/14
-      # is the best source for possible updates. Once the UI is updated we will
-      # most likely be able leverage the functionality of upload-artifact v2(+)
-      # to upload a single file as an artifact. Until then we extract the
-      # contents to the "lambda_zip_contents" directory to let
-      # actions/upload-artifacts repackage them for availability on GitHub.
-      - name: Unzip generated zip
+      '- uses: 'actions/checkout@v2
+      '- name: 
+      'Get short SHA for the commit being used
+        run: 
+        '|
+        '  echo' 
+        '"GH_SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+     ' - n
+      'name
+     ' Build Docker image
+        '# DOCKER_BUILDKIT=1 tells Docker to use BuildKit when building the
+        '# image per:
+       ' # https://docs.docker.com/develop/develop-images/build_enhancements/
+        run: '|
+          'DOCKER_BUILDKIT=1 docker-compose build \
+            '-'
+            '''-build-arg PY_VERSION=${{ matrix.python-version }} \
+            -''-
+            ''
+            'bb
+            '-build-arg
+            'LE_NAME=${{ github.event.repository.name }}
+      '- name: 'Generate lambda zip
+        run: 'docker-compose up
+     ' # We have to unzip the produced lambda zip because of limitations with the
+     ' # GitHub UI. Any files uploaded are packaged into a single zip to allow a
+     ' # user to download the artifacts of a build. This issue:
+     ' # https://github.com/actions/upload-artifact/issues/14
+     ' # is the best source for possible updates. Once the UI is updated we will
+     ' # most likely be able leverage the functionality of upload-artifact v2(+)
+     ' # to upload a single file as an artifact. Until then we extract the
+     ' # contents to the "lambda_zip_contents" directory to let
+     ' # actions/upload-artifacts repackage them for availability on GitHub.
+      - name: 'Unzip generated zip
         run: |
           unzip ${{ github.event.repository.name }}.zip \
             -d lambda_zip_contents
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+      - 'name:'
+      'Upload artifacts
+        uses: '
+       ' artifacts
+        'pload-artifact@v2
         with:
           name: "${{ github.event.repository.name }}-\
             py${{ matrix.python-version }}-\
