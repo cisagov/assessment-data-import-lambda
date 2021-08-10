@@ -8,13 +8,10 @@ set -o pipefail
 # requirements and then exit.
 function check_dependencies {
   required_tools="pip python zip"
-  for tool in $required_tools
-  do
-    if [ -z "$(command -v "$tool")" ]
-    then
+  for tool in $required_tools; do
+    if [ -z "$(command -v "$tool")" ]; then
       echo "This script requires the following tools to run:"
-      for item in $required_tools
-      do
+      for item in $required_tools; do
         echo "- $item"
       done
       exit 1
@@ -93,13 +90,11 @@ cp lambda_handler.py "$BUILD_DIR"
 # Zip it all up.
 ###
 OUTPUT_DIR="/output"
-if [ ! -d "$OUTPUT_DIR" ]
-then
+if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir "$OUTPUT_DIR"
 fi
 
-if [ -e "$OUTPUT_DIR/$ZIP_FILE" ]
-then
+if [ -e "$OUTPUT_DIR/$ZIP_FILE" ]; then
   rm "$OUTPUT_DIR/$ZIP_FILE"
 fi
 cd $BUILD_DIR
